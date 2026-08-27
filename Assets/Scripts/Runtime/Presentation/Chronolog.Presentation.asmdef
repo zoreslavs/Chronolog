@@ -1,0 +1,19 @@
+{
+  "name": "Chronolog.Presentation",
+  "rootNamespace": "Chronolog.Presentation",
+  "references": [
+    "Chronolog.Domain",
+    "Chronolog.Persistence",
+    "NativeCamera.Runtime",
+    "NativeGallery.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
