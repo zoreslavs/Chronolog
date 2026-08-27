@@ -8,7 +8,7 @@ namespace Chronolog.Presentation
 {
     public sealed class JournalRecordFormScreen : MonoBehaviour
     {
-        private const int ImagePreviewMaxSize = 1024;
+        private const int FormImagePreviewMaxSize = 1024;
 
         [SerializeField] private InputField contentInput;
         [SerializeField] private GameObject imagePlaceholder;
@@ -44,6 +44,7 @@ namespace Chronolog.Presentation
         public void SetImage(string localImagePath, JournalImageSource imageSource)
         {
             formData.SetImage(localImagePath, imageSource);
+            ShowImagePreview(localImagePath);
             RefreshSaveButton();
         }
 
@@ -72,13 +73,27 @@ namespace Chronolog.Presentation
             RefreshSaveButton();
         }
 
+        private void ShowImagePreview(string localImagePath)
+        {
+            ClearImagePreview();
+            imagePreviewTexture = NativeGallery.LoadImageAtPath(localImagePath, FormImagePreviewMaxSize);
+
+            if (imagePreview == null || imagePreviewTexture == null)
+                return;
+
+            imagePreview.texture = imagePreviewTexture;
+            var aspectRatioFitter = imagePreview.GetComponent<AspectRatioFitter>();
+
+            if (aspectRatioFitter != null)
+                aspectRatioFitter.aspectRatio = (float)imagePreviewTexture.width / imagePreviewTexture.height;
+
+            GetImagePlaceholderLabel().SetActive(false);
+        }
+
         private void ClearImagePreview()
         {
             if (imagePreview != null)
-            {
                 imagePreview.texture = null;
-                imagePreview.gameObject.SetActive(false);
-            }
 
             if (imagePreviewTexture != null)
             {

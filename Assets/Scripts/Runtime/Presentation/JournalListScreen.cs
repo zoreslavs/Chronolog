@@ -11,7 +11,6 @@ namespace Chronolog.Presentation
         [SerializeField] private JournalScreenNavigator navigator;
         [SerializeField] private RectTransform recordsContainer;
         [SerializeField] private JournalListRecordView recordViewPrefab;
-        [SerializeField] private Text statusLabel;
         private JournalListData journalListData;
 
         private void Start()
