@@ -1,0 +1,21 @@
+{
+  "name": "Chronolog.Tests",
+  "rootNamespace": "Chronolog.Tests",
+  "references": [
+    "Chronolog.Domain",
+    "Chronolog.Persistence",
+    "Chronolog.Presentation"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "autoReferenced": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
