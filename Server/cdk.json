@@ -1,0 +1,3 @@
+{
+  "app": "dotnet run --project Chronolog.Server.Infrastructure/Chronolog.Server.Infrastructure.csproj -- Chronolog.Server.Api/bin/Release/net8.0/publish"
+}
