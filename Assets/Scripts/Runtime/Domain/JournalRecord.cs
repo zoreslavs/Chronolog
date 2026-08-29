@@ -78,9 +78,8 @@ namespace Chronolog.Domain
             return record;
         }
 
-        public void MarkSyncing(DateTimeOffset updatedAtUtc)
+        public void MarkSyncing()
         {
-            UpdatedAtUtc = updatedAtUtc;
             SyncState = JournalSyncState.Syncing;
             LastSyncError = null;
         }
@@ -97,12 +96,11 @@ namespace Chronolog.Domain
             LastSyncError = null;
         }
 
-        public void MarkFailed(string errorMessage, DateTimeOffset updatedAtUtc)
+        public void MarkFailed(string errorMessage)
         {
             if (string.IsNullOrWhiteSpace(errorMessage))
                 throw new ArgumentException("Sync error message is required.", nameof(errorMessage));
 
-            UpdatedAtUtc = updatedAtUtc;
             SyncState = JournalSyncState.Failed;
             LastSyncError = errorMessage;
         }

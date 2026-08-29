@@ -84,7 +84,7 @@ namespace Chronolog.Presentation
                 yield break;
 
             SetStatus(JournalSyncStatus.Syncing);
-            record.MarkSyncing(DateTimeOffset.UtcNow);
+            record.MarkSyncing();
             repository.Save(record);
 
             if (record.IsDeleted)
@@ -356,7 +356,7 @@ namespace Chronolog.Presentation
 
         private void MarkFailed(JournalRecord record, string errorMessage)
         {
-            record.MarkFailed(errorMessage, DateTimeOffset.UtcNow);
+            record.MarkFailed(errorMessage);
             repository.Save(record);
             hadFailures = true;
             Debug.LogWarning($"Journal record {record.Id} could not be synced: {errorMessage}");

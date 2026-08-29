@@ -14,7 +14,7 @@ namespace Chronolog.Presentation
         public event Action BecameReachable;
         public event Action BecameUnreachable;
 
-        private void Start()
+        private void Awake()
         {
             IsReachable = CheckReachability();
             wasReachable = IsReachable;

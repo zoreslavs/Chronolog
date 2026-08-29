@@ -31,7 +31,7 @@ namespace Chronolog.Presentation
         {
             this.record = record ?? throw new ArgumentNullException(nameof(record));
             this.recordSelected = recordSelected;
-            dateLabel.text = record.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy · HH:mm");
+            dateLabel.text = GetDateLabelText(record);
             contentLabel.text = record.Content;
             imageSourceLabel.text = record.ImageSource.ToString();
 
@@ -54,6 +54,16 @@ namespace Chronolog.Presentation
         private void Select()
         {
             recordSelected?.Invoke(record);
+        }
+
+        private static string GetDateLabelText(JournalRecord record)
+        {
+            var createdAt = record.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy · HH:mm");
+            if (record.UpdatedAtUtc == record.CreatedAtUtc)
+                return createdAt;
+
+            var updatedAt = record.UpdatedAtUtc.ToLocalTime().ToString("dd MMM yyyy · HH:mm");
+            return $"{createdAt} | Edited {updatedAt}";
         }
 
         private void SetImagePreview(string localImagePath)
