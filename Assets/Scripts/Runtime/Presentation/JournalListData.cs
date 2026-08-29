@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Chronolog.Domain;
+using System.Linq;
 using System;
 
 namespace Chronolog.Presentation
@@ -23,7 +24,7 @@ namespace Chronolog.Presentation
             if (repository == null)
                 throw new ArgumentNullException(nameof(repository));
 
-            return new JournalListData(repository.GetAll());
+            return new JournalListData(repository.GetAll().Where(record => !record.IsDeleted).ToArray());
         }
     }
 }

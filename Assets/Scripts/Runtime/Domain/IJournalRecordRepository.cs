@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 
 namespace Chronolog.Domain
 {
@@ -7,5 +8,7 @@ namespace Chronolog.Domain
         IReadOnlyList<JournalRecord> GetAll();
 
         void Save(JournalRecord record);
+
+        void Delete(Guid recordId);
     }
 }

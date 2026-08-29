@@ -1,3 +1,4 @@
+using Chronolog.Domain;
 using UnityEngine;
 
 namespace Chronolog.Presentation
@@ -17,6 +18,12 @@ namespace Chronolog.Presentation
         {
             listScreen.SetActive(false);
             formScreen.SetActive(true);
+        }
+
+        public void ShowForm(JournalRecord record)
+        {
+            ShowForm();
+            formScreen.GetComponent<JournalRecordFormScreen>().Open(record);
         }
     }
 }

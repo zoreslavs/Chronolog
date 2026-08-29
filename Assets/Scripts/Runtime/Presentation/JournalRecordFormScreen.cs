@@ -13,9 +13,13 @@ namespace Chronolog.Presentation
         [SerializeField] private InputField contentInput;
         [SerializeField] private GameObject imagePlaceholder;
         [SerializeField] private Button cancelButton;
+        [SerializeField] private Button deleteButton;
+        [SerializeField] private Toggle highlightToggle;
         [SerializeField] private RawImage imagePreview;
         [SerializeField] private JournalScreenNavigator navigator;
         [SerializeField] private Button saveButton;
+        [SerializeField] private JournalSyncService syncService;
+        [SerializeField] private JournalDeleteRecordPopup deletePopup;
 
         private readonly JournalRecordFormData formData = new();
         private Texture2D imagePreviewTexture;
@@ -25,6 +29,17 @@ namespace Chronolog.Presentation
             contentInput.onValueChanged.AddListener(SetContent);
             cancelButton.onClick.AddListener(Cancel);
             saveButton.onClick.AddListener(Save);
+            deleteButton.onClick.AddListener(ShowDeletePopup);
+            highlightToggle.onValueChanged.AddListener(SetHighlighted);
+
+            deletePopup.OnDeleteConfirmed = confirmed =>
+            {
+                if (confirmed)
+                    ConfirmDelete();
+                else
+                    CancelDelete();
+            };
+
             ResetForm();
         }
 
@@ -33,6 +48,10 @@ namespace Chronolog.Presentation
             contentInput.onValueChanged.RemoveListener(SetContent);
             cancelButton.onClick.RemoveListener(Cancel);
             saveButton.onClick.RemoveListener(Save);
+            deleteButton.onClick.RemoveListener(ShowDeletePopup);
+            highlightToggle.onValueChanged.RemoveListener(SetHighlighted);
+
+            deletePopup.OnDeleteConfirmed = null;
         }
 
         public void SetContent(string content)
@@ -48,10 +67,26 @@ namespace Chronolog.Presentation
             RefreshSaveButton();
         }
 
+        public void SetHighlighted(bool isHighlighted)
+        {
+            formData.SetHighlighted(isHighlighted);
+        }
+
         public void Cancel()
         {
             ResetForm();
             navigator.ShowList();
+        }
+
+        public void Open(JournalRecord record)
+        {
+            formData.Load(record);
+            contentInput.SetTextWithoutNotify(formData.Content);
+            highlightToggle.SetIsOnWithoutNotify(formData.IsHighlighted);
+
+            ShowImagePreview(formData.LocalImagePath);
+            RefreshDeleteButton();
+            RefreshSaveButton();
         }
 
         public void Save()
@@ -62,6 +97,32 @@ namespace Chronolog.Presentation
             var journalRecord = formData.CreateRecord(Guid.NewGuid(), DateTimeOffset.UtcNow);
             var repository = new JsonJournalRecordRepository(JournalRecordStoragePath.GetRecordsFilePath());
             repository.Save(journalRecord);
+            syncService?.Sync(journalRecord);
+            navigator.ShowList();
+        }
+
+        public void ShowDeletePopup()
+        {
+            if (formData.IsEditing)
+                deletePopup.gameObject.SetActive(true);
+        }
+
+        public void CancelDelete()
+        {
+            deletePopup.gameObject.SetActive(false);
+        }
+
+        public void ConfirmDelete()
+        {
+            if (!formData.IsEditing)
+                return;
+
+            var record = formData.EditingRecord;
+            record.MarkForDeletion(DateTimeOffset.UtcNow);
+            var repository = new JsonJournalRecordRepository(JournalRecordStoragePath.GetRecordsFilePath());
+            repository.Save(record);
+            syncService?.Sync(record);
+            ResetForm();
             navigator.ShowList();
         }
 
@@ -69,7 +130,11 @@ namespace Chronolog.Presentation
         {
             formData.Clear();
             contentInput.SetTextWithoutNotify(string.Empty);
+            highlightToggle.SetIsOnWithoutNotify(false);
+
             ClearImagePreview();
+            CancelDelete();
+            RefreshDeleteButton();
             RefreshSaveButton();
         }
 
@@ -113,6 +178,11 @@ namespace Chronolog.Presentation
         private void RefreshSaveButton()
         {
             saveButton.interactable = formData.CanSave;
+        }
+
+        private void RefreshDeleteButton()
+        {
+            deleteButton.gameObject.SetActive(formData.IsEditing);
         }
     }
 }

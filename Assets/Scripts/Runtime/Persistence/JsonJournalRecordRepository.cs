@@ -49,6 +49,16 @@ namespace Chronolog.Persistence
             WriteDocument(document);
         }
 
+        public void Delete(Guid recordId)
+        {
+            if (!File.Exists(storageFilePath))
+                return;
+
+            var document = ReadDocument();
+            document.records.RemoveAll(record => record.id == recordId.ToString("D"));
+            WriteDocument(document);
+        }
+
         private JournalRecordStoreDocument ReadDocument()
         {
             var json = File.ReadAllText(storageFilePath);

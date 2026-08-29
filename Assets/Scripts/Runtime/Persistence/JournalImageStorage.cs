@@ -29,5 +29,21 @@ namespace Chronolog.Persistence
 
             return destinationImagePath;
         }
+
+        public string SaveToLocalStorage(byte[] imageBytes, string fileExtension)
+        {
+            if (imageBytes == null)
+                throw new ArgumentNullException(nameof(imageBytes));
+
+            if (string.IsNullOrWhiteSpace(fileExtension) || !fileExtension.StartsWith("."))
+                throw new ArgumentException("Image file extension is required.", nameof(fileExtension));
+
+            var imagesDirectoryPath = Path.Combine(storageDirectoryPath, ImagesDirectoryName);
+            Directory.CreateDirectory(imagesDirectoryPath);
+
+            var destinationImagePath = Path.Combine(imagesDirectoryPath, $"{Guid.NewGuid():N}{fileExtension}");
+            File.WriteAllBytes(destinationImagePath, imageBytes);
+            return destinationImagePath;
+        }
     }
 }

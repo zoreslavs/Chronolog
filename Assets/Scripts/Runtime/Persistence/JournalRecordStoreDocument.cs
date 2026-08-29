@@ -26,6 +26,8 @@ namespace Chronolog.Persistence
         public string serverReceivedAtUtc;
         public int syncState;
         public string lastSyncError;
+        public bool isHighlighted;
+        public bool isDeleted;
 
         public static JournalRecordDocument FromRecord(JournalRecord record)
         {
@@ -42,7 +44,9 @@ namespace Chronolog.Persistence
                     ? record.ServerReceivedAtUtc.Value.ToString("O", CultureInfo.InvariantCulture)
                     : null,
                 syncState = (int)record.SyncState,
-                lastSyncError = record.LastSyncError
+                lastSyncError = record.LastSyncError,
+                isHighlighted = record.IsHighlighted,
+                isDeleted = record.IsDeleted
             };
         }
 
@@ -84,7 +88,9 @@ namespace Chronolog.Persistence
                 updatedAt,
                 serverReceivedAt,
                 (JournalSyncState)syncState,
-                ToOptionalValue(lastSyncError));
+                ToOptionalValue(lastSyncError),
+                isHighlighted,
+                isDeleted);
         }
 
         private static string ToOptionalValue(string value) => string.IsNullOrEmpty(value) ? null : value;

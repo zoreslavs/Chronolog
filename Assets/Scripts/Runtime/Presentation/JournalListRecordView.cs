@@ -12,26 +12,48 @@ namespace Chronolog.Presentation
 
         [SerializeField] private Text dateLabel;
         [SerializeField] private Text contentLabel;
+        [SerializeField] private Image imageBackgroud;
         [SerializeField] private RawImage imagePreview;
         [SerializeField] private Text imageSourceLabel;
+        [SerializeField] private Button selectButton;
+        [SerializeField] private Color highlightColor;
 
         private Texture2D imagePreviewTexture;
+        private Action<JournalRecord> recordSelected;
+        private JournalRecord record;
 
         public void Init(JournalRecord record)
         {
-            if (record == null)
-                throw new ArgumentNullException(nameof(record));
+            Init(record, null);
+        }
 
+        public void Init(JournalRecord record, Action<JournalRecord> recordSelected)
+        {
+            this.record = record ?? throw new ArgumentNullException(nameof(record));
+            this.recordSelected = recordSelected;
             dateLabel.text = record.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy · HH:mm");
             contentLabel.text = record.Content;
             imageSourceLabel.text = record.ImageSource.ToString();
+
+            if (record.IsHighlighted && imageBackgroud != null)
+                imageBackgroud.color = highlightColor;
+
+            selectButton.onClick.AddListener(Select);
+
             SetImagePreview(record.LocalImagePath);
         }
 
         private void OnDestroy()
         {
+            selectButton.onClick.RemoveListener(Select);
+
             if (imagePreviewTexture != null)
                 Destroy(imagePreviewTexture);
+        }
+
+        private void Select()
+        {
+            recordSelected?.Invoke(record);
         }
 
         private void SetImagePreview(string localImagePath)
