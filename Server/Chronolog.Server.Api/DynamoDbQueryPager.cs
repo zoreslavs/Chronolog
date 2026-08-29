@@ -13,7 +13,7 @@ public static class DynamoDbQueryPager
         do
         {
             var response = await queryPage(startKey);
-            items.AddRange(response.Items);
+            items.AddRange(response.Items ?? []);
             startKey = response.LastEvaluatedKey is { Count: > 0 } ? response.LastEvaluatedKey : null;
         }
         while (startKey != null);

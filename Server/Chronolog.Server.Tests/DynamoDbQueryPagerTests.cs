@@ -35,6 +35,14 @@ public sealed class DynamoDbQueryPagerTests
         Assert.Equal("older", queryStartKeys[1]!["id"].S);
     }
 
+    [Fact]
+    public async Task ReadAllAsync_ReturnsAnEmptyListWhenDynamoDbOmitsItems()
+    {
+        var items = await DynamoDbQueryPager.ReadAllAsync(_ => Task.FromResult(new QueryResponse { Items = null! }));
+
+        Assert.Empty(items);
+    }
+
     private static Dictionary<string, AttributeValue> CreateItem(string id)
     {
         return new Dictionary<string, AttributeValue>

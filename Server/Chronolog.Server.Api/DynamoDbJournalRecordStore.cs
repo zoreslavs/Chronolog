@@ -42,7 +42,7 @@ public sealed class DynamoDbJournalRecordStore : IJournalRecordStore
             Key = GetKey(deviceId, recordId)
         });
 
-        return response.Item.Count == 0 ? null : ToRecord(response.Item);
+        return response.Item is not { Count: > 0 } ? null : ToRecord(response.Item);
     }
 
     public async Task<IReadOnlyList<RemoteJournalRecord>> ListAsync(string deviceId)
@@ -90,6 +90,6 @@ public sealed class DynamoDbJournalRecordStore : IJournalRecordStore
             item["content"].S,
             item["imageSource"].S,
             item["imageKey"].S,
-            item["isHighlighted"].BOOL ?? false);
+            item.TryGetValue("isHighlighted", out var isHighlighted) && isHighlighted.BOOL == true);
     }
 }
