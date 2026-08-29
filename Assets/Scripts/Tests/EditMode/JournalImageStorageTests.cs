@@ -39,5 +39,18 @@ namespace Chronolog.Tests
             Assert.That(Path.GetExtension(localImagePath), Is.EqualTo(".jpg"));
             Assert.That(File.ReadAllBytes(localImagePath), Is.EqualTo(sourceImageBytes));
         }
+
+        [Test]
+        public void SaveToLocalStorage_WritesDownloadedImageBytesWithTheRequestedExtension()
+        {
+            var imageStorage = new JournalImageStorage(storageDirectoryPath);
+            var imageBytes = new byte[] { 4, 8, 15, 16, 23, 42 };
+
+            var localImagePath = imageStorage.SaveToLocalStorage(imageBytes, ".png");
+
+            Assert.That(Path.GetDirectoryName(localImagePath), Is.EqualTo(Path.Combine(storageDirectoryPath, "images")));
+            Assert.That(Path.GetExtension(localImagePath), Is.EqualTo(".png"));
+            Assert.That(File.ReadAllBytes(localImagePath), Is.EqualTo(imageBytes));
+        }
     }
 }

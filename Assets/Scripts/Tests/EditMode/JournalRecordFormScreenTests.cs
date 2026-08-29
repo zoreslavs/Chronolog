@@ -1,10 +1,12 @@
 using Chronolog.Domain;
+using Chronolog.Persistence;
 using Chronolog.Presentation;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using System.Linq;
 
 namespace Chronolog.Tests
 {
@@ -90,18 +92,30 @@ namespace Chronolog.Tests
             ConfigureNavigator(navigator, listScreen, formScreen);
             ConfigureForm(formScreen, contentInput, imagePlaceholder, cancelButton, saveButton, navigator);
             var imagePath = CreateImageFile();
-            formScreen.SetContent("A calm afternoon walk.");
-            formScreen.SetImage(imagePath, JournalImageSource.Gallery);
+            var repository = new JsonJournalRecordRepository(JournalRecordStoragePath.GetRecordsFilePath());
 
-            formScreen.Save();
+            try
+            {
+                formScreen.SetContent("A calm afternoon walk.");
+                formScreen.SetImage(imagePath, JournalImageSource.Gallery);
+                formScreen.Save();
 
-            Assert.That(listScreen.activeSelf, Is.True);
-            Assert.That(formObject.activeSelf, Is.False);
+                Assert.That(listScreen.activeSelf, Is.True);
+                Assert.That(formObject.activeSelf, Is.False);
+            }
+            finally
+            {
+                var testRecord = repository.GetAll().SingleOrDefault(record => record.LocalImagePath == imagePath);
+                if (testRecord != null)
+                    repository.Delete(testRecord.Id);
 
-            File.Delete(imagePath);
-            Object.DestroyImmediate(navigatorObject);
-            Object.DestroyImmediate(listScreen);
-            Object.DestroyImmediate(formObject);
+                File.Delete(imagePath);
+                Object.DestroyImmediate(navigatorObject);
+                Object.DestroyImmediate(listScreen);
+                Object.DestroyImmediate(formObject);
+            }
+
+            Assert.That(repository.GetAll().Any(record => record.LocalImagePath == imagePath), Is.False);
         }
 
         [Test]
@@ -117,8 +131,18 @@ namespace Chronolog.Tests
             var imagePlaceholder = new GameObject("Image Placeholder");
             imagePlaceholder.transform.SetParent(formObject.transform, false);
             var saveButton = CreateButton("Save", formObject.transform);
+            var deleteButton = CreateButton("Delete", formObject.transform);
+            var highlightToggle = CreateToggle("Highlight", formObject.transform);
+            var deletePopupObject = new GameObject("Delete Popup");
+            deletePopupObject.SetActive(false);
+            var deletePopup = deletePopupObject.AddComponent<JournalDeleteRecordPopup>();
             ConfigureNavigator(navigator, listScreen, formScreen);
             ConfigureForm(formScreen, contentInput, imagePlaceholder, null, saveButton, navigator);
+            var serializedFormScreen = new SerializedObject(formScreen);
+            serializedFormScreen.FindProperty("deleteButton").objectReferenceValue = deleteButton;
+            serializedFormScreen.FindProperty("highlightToggle").objectReferenceValue = highlightToggle;
+            serializedFormScreen.FindProperty("deletePopup").objectReferenceValue = deletePopup;
+            serializedFormScreen.ApplyModifiedPropertiesWithoutUndo();
 
             formScreen.Cancel();
 
@@ -128,6 +152,7 @@ namespace Chronolog.Tests
             Object.DestroyImmediate(navigatorObject);
             Object.DestroyImmediate(listScreen);
             Object.DestroyImmediate(formObject);
+            Object.DestroyImmediate(deletePopupObject);
         }
 
         private static Button CreateButton(string name, Transform parent)
@@ -142,6 +167,13 @@ namespace Chronolog.Tests
             var inputObject = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(InputField));
             inputObject.transform.SetParent(parent, false);
             return inputObject.GetComponent<InputField>();
+        }
+
+        private static Toggle CreateToggle(string name, Transform parent)
+        {
+            var toggleObject = new GameObject(name, typeof(RectTransform), typeof(Toggle));
+            toggleObject.transform.SetParent(parent, false);
+            return toggleObject.GetComponent<Toggle>();
         }
 
         private static void ConfigureForm(

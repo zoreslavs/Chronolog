@@ -54,7 +54,8 @@ namespace Chronolog.Tests
                 updatedAtUtc,
                 serverReceivedAtUtc,
                 JournalSyncState.Synced,
-                null);
+                null,
+                true);
 
             new JsonJournalRecordRepository(storageFilePath).Save(record);
 
@@ -70,6 +71,7 @@ namespace Chronolog.Tests
             Assert.That(restoredRecord.ServerReceivedAtUtc, Is.EqualTo(serverReceivedAtUtc));
             Assert.That(restoredRecord.SyncState, Is.EqualTo(JournalSyncState.Synced));
             Assert.That(restoredRecord.LastSyncError, Is.Null);
+            Assert.That(restoredRecord.IsHighlighted, Is.True);
         }
 
         [Test]
@@ -130,6 +132,30 @@ namespace Chronolog.Tests
             var records = repository.GetAll();
 
             Assert.That(records.Select(record => record.Id), Is.EqualTo(new[] { newerRecord.Id, olderRecord.Id }));
+        }
+
+        [Test]
+        public void Delete_RemovesOnlyTheRequestedRecord()
+        {
+            var repository = new JsonJournalRecordRepository(storageFilePath);
+            var firstRecord = JournalRecord.Create(
+                Guid.Parse("d0ec8c32-6477-4a7e-af89-709d7bf2ff49"),
+                "First entry",
+                JournalImageSource.Camera,
+                "images/first.jpg",
+                new DateTimeOffset(2026, 8, 25, 9, 0, 0, TimeSpan.Zero));
+            var secondRecord = JournalRecord.Create(
+                Guid.Parse("76fc1a96-a78e-4a1a-a6b5-d42024bc6760"),
+                "Second entry",
+                JournalImageSource.Gallery,
+                "images/second.jpg",
+                new DateTimeOffset(2026, 8, 26, 9, 0, 0, TimeSpan.Zero));
+            repository.Save(firstRecord);
+            repository.Save(secondRecord);
+
+            repository.Delete(firstRecord.Id);
+
+            Assert.That(repository.GetAll().Select(record => record.Id), Is.EqualTo(new[] { secondRecord.Id }));
         }
     }
 }

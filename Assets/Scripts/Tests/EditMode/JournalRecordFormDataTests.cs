@@ -54,5 +54,45 @@ namespace Chronolog.Tests
             Assert.That(record.LocalImagePath, Is.EqualTo("images/2799dc7a.jpg"));
             Assert.That(record.CreatedAtUtc, Is.EqualTo(createdAtUtc));
         }
+
+        [Test]
+        public void CreateRecord_UsesTheSelectedHighlightState()
+        {
+            var formData = new JournalRecordFormData();
+            formData.SetContent("A calm afternoon walk.");
+            formData.SetImage("images/2799dc7a.jpg", JournalImageSource.Gallery);
+            formData.SetHighlighted(true);
+
+            var record = formData.CreateRecord(Guid.NewGuid(), DateTimeOffset.UtcNow);
+
+            Assert.That(record.IsHighlighted, Is.True);
+        }
+
+        [Test]
+        public void Load_UpdatesTheExistingRecordInsteadOfCreatingANewOne()
+        {
+            var recordId = Guid.Parse("2799dc7a-8cdc-4127-8a90-6e67b6abe7d9");
+            var createdAtUtc = new DateTimeOffset(2026, 8, 27, 9, 30, 0, TimeSpan.Zero);
+            var existingRecord = JournalRecord.Create(
+                recordId,
+                "Original entry",
+                JournalImageSource.Camera,
+                "images/original.jpg",
+                createdAtUtc);
+            existingRecord.MarkSynced("images/android-a1b2c3d4e5f60708/original.jpg", false, createdAtUtc);
+            var formData = new JournalRecordFormData();
+
+            formData.Load(existingRecord);
+            formData.SetContent("Updated entry");
+            formData.SetImage("images/replacement.png", JournalImageSource.Gallery);
+            var savedRecord = formData.CreateRecord(Guid.NewGuid(), createdAtUtc.AddMinutes(5));
+
+            Assert.That(savedRecord, Is.SameAs(existingRecord));
+            Assert.That(savedRecord.Id, Is.EqualTo(recordId));
+            Assert.That(savedRecord.CreatedAtUtc, Is.EqualTo(createdAtUtc));
+            Assert.That(savedRecord.Content, Is.EqualTo("Updated entry"));
+            Assert.That(savedRecord.LocalImagePath, Is.EqualTo("images/replacement.png"));
+            Assert.That(savedRecord.SyncState, Is.EqualTo(JournalSyncState.Pending));
+        }
     }
 }
