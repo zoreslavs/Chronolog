@@ -12,12 +12,13 @@ namespace Chronolog.Presentation
 
         [SerializeField] private InputField contentInput;
         [SerializeField] private GameObject imagePlaceholder;
+        [SerializeField] private RawImage imageForeground;
+        [SerializeField] private Image imagePreview;
         [SerializeField] private Button cancelButton;
         [SerializeField] private Button deleteButton;
-        [SerializeField] private Toggle highlightToggle;
-        [SerializeField] private RawImage imagePreview;
-        [SerializeField] private JournalScreenNavigator navigator;
         [SerializeField] private Button saveButton;
+        [SerializeField] private Toggle highlightToggle;
+        [SerializeField] private JournalScreenNavigator navigator;
         [SerializeField] private JournalSyncService syncService;
         [SerializeField] private JournalDeleteRecordPopup deletePopup;
 
@@ -146,19 +147,17 @@ namespace Chronolog.Presentation
             if (imagePreview == null || imagePreviewTexture == null)
                 return;
 
-            imagePreview.texture = imagePreviewTexture;
-            var aspectRatioFitter = imagePreview.GetComponent<AspectRatioFitter>();
-
-            if (aspectRatioFitter != null)
-                aspectRatioFitter.aspectRatio = (float)imagePreviewTexture.width / imagePreviewTexture.height;
+            imageForeground.texture = imagePreviewTexture;
+            imageForeground.gameObject.SetActive(true);
+            SetForegroundSize(imagePreviewTexture);
 
             GetImagePlaceholderLabel().SetActive(false);
         }
 
         private void ClearImagePreview()
         {
-            if (imagePreview != null)
-                imagePreview.texture = null;
+            imageForeground.texture = null;
+            imageForeground.gameObject.SetActive(false);
 
             if (imagePreviewTexture != null)
             {
@@ -173,6 +172,13 @@ namespace Chronolog.Presentation
         {
             var placeholderLabel = imagePlaceholder.GetComponentInChildren<Text>(true);
             return placeholderLabel != null ? placeholderLabel.gameObject : imagePlaceholder;
+        }
+
+        private void SetForegroundSize(Texture2D texture)
+        {
+            var parentSize = imagePreview.rectTransform.rect.size;
+            var scale = Mathf.Min(parentSize.x / texture.width, parentSize.y / texture.height);
+            imageForeground.rectTransform.sizeDelta = new Vector2(texture.width * scale, texture.height * scale);
         }
 
         private void RefreshSaveButton()

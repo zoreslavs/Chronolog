@@ -16,7 +16,7 @@ PlayerSettings:
   productName: Chronolog
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
-  m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
+  m_SplashScreenBackgroundColor: {r: 0.96862745, g: 0.9607843, b: 0.9411765, a: 1}
   m_ShowUnitySplashScreen: 1
   m_ShowUnitySplashLogo: 0
   m_SplashScreenOverlayOpacity: 1
@@ -271,7 +271,7 @@ PlayerSettings:
   AndroidTargetArchitectures: 3
   AndroidAllowedArchitectures: -13
   AndroidSplashScreenScale: 0
-  androidSplashScreen: {fileID: 0}
+  androidSplashScreen: {fileID: 2800000, guid: 457f96463b28649d39887f6216ccd1bb, type: 3}
   AndroidKeystoreName: 
   AndroidKeyaliasName: 
   AndroidEnableArmv9SecurityFeatures: 0
@@ -398,7 +398,9 @@ PlayerSettings:
       m_SubKind: App Store
   - m_BuildTarget: Android
     m_Icons:
-    - m_Textures: []
+    - m_Textures:
+      - {fileID: 2800000, guid: eb9b4a82bfe7941769571bf46359d764, type: 3}
+      - {fileID: 2800000, guid: cc40352934a794a3a8db17652c43967e, type: 3}
       m_Width: 432
       m_Height: 432
       m_Kind: 2
@@ -428,7 +430,8 @@ PlayerSettings:
       m_Height: 81
       m_Kind: 2
       m_SubKind: 
-    - m_Textures: []
+    - m_Textures:
+      - {fileID: 2800000, guid: 61c0baf0650d0438d86000156e4eeb18, type: 3}
       m_Width: 192
       m_Height: 192
       m_Kind: 1
@@ -483,7 +486,8 @@ PlayerSettings:
       m_Height: 48
       m_Kind: 0
       m_SubKind: 
-    - m_Textures: []
+    - m_Textures:
+      - {fileID: 2800000, guid: 61c0baf0650d0438d86000156e4eeb18, type: 3}
       m_Width: 36
       m_Height: 36
       m_Kind: 0
@@ -751,7 +755,7 @@ PlayerSettings:
   monoEnv: 
   splashScreenBackgroundSourceLandscape: {fileID: 0}
   splashScreenBackgroundSourcePortrait: {fileID: 0}
-  blurSplashScreenBackground: 1
+  blurSplashScreenBackground: 0
   spritePackerPolicy: 
   webGLMemorySize: 32
   webGLExceptionSupport: 1

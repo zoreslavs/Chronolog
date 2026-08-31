@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3218c4c9423a64c808ac4c7a6d537a57
+guid: 22995aad613284ca7913fef83727bfea
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8107366635331182373
-    second: white_circle_0
+      213: 8310941333892004508
+    second: list_background_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -48,11 +48,11 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 1
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteBorder: {x: 18, y: 18, z: 18, w: 18}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -139,7 +139,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: white_circle_0
+      name: list_background_0
       rect:
         serializedVersion: 2
         x: 0
@@ -147,15 +147,15 @@ TextureImporter:
         width: 300
         height: 300
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 52fd4ca0007238070800000000000000
-      internalID: 8107366635331182373
+      spriteID: c9a7eb32c15665370800000000000000
+      internalID: 8310941333892004508
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      white_circle_0: 8107366635331182373
+      list_background_0: 8310941333892004508
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

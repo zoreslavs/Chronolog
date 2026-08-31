@@ -13,9 +13,14 @@ namespace Chronolog.Presentation
         [SerializeField] private Text dateLabel;
         [SerializeField] private Text contentLabel;
         [SerializeField] private Image imageBackgroud;
-        [SerializeField] private RawImage imagePreview;
+        [SerializeField] private Image imagePreview;
+        [SerializeField] private RawImage imageForeground;
         [SerializeField] private Text imageSourceLabel;
+        [SerializeField] private Image imageSourceIcon;
+        [SerializeField] private Sprite cameraIcon;
+        [SerializeField] private Sprite galleryIcon;
         [SerializeField] private Button selectButton;
+        [SerializeField] private GameObject highlightBadge;
         [SerializeField] private Color highlightColor;
 
         private Texture2D imagePreviewTexture;
@@ -34,8 +39,11 @@ namespace Chronolog.Presentation
             dateLabel.text = GetDateLabelText(record);
             contentLabel.text = record.Content;
             imageSourceLabel.text = record.ImageSource.ToString();
+            SetImageSourceIcon(record.ImageSource);
 
-            if (record.IsHighlighted && imageBackgroud != null)
+            highlightBadge.SetActive(record.IsHighlighted);
+
+            if (record.IsHighlighted)
                 imageBackgroud.color = highlightColor;
 
             selectButton.onClick.AddListener(Select);
@@ -47,8 +55,7 @@ namespace Chronolog.Presentation
         {
             selectButton.onClick.RemoveListener(Select);
 
-            if (imagePreviewTexture != null)
-                Destroy(imagePreviewTexture);
+            ClearImagePreviewTexture();
         }
 
         private void Select()
@@ -71,38 +78,53 @@ namespace Chronolog.Presentation
             if (imagePreview == null)
                 return;
 
-            if (imagePreviewTexture != null)
-            {
-                Destroy(imagePreviewTexture);
-                imagePreviewTexture = null;
-            }
+            ClearImagePreviewTexture();
 
             if (string.IsNullOrWhiteSpace(localImagePath) || !File.Exists(localImagePath))
             {
-                imagePreview.texture = null;
                 imagePreview.gameObject.SetActive(false);
                 return;
             }
 
             imagePreviewTexture = NativeGallery.LoadImageAtPath(localImagePath, ThumbnailMaxSize);
-            imagePreview.texture = imagePreviewTexture;
-            imagePreview.uvRect = GetSquareCropRect(imagePreviewTexture);
+
+            if (imagePreviewTexture == null)
+            {
+                imagePreview.gameObject.SetActive(false);
+                return;
+            }
+
+            imageForeground.texture = imagePreviewTexture;
+            imageForeground.uvRect = new Rect(0f, 0f, 1f, 1f);
+            SetForegroundSize(imagePreviewTexture);
+
             imagePreview.gameObject.SetActive(imagePreviewTexture != null);
         }
 
-        private static Rect GetSquareCropRect(Texture2D texture)
+        private void SetImageSourceIcon(JournalImageSource imageSource)
         {
-            if (texture == null || texture.width == texture.height)
-                return new Rect(0f, 0f, 1f, 1f);
+            if (imageSourceIcon == null)
+                return;
 
-            if (texture.width > texture.height)
-            {
-                var width = (float)texture.height / texture.width;
-                return new Rect((1f - width) / 2f, 0f, width, 1f);
-            }
-
-            var height = (float)texture.width / texture.height;
-            return new Rect(0f, (1f - height) / 2f, 1f, height);
+            imageSourceIcon.sprite = imageSource == JournalImageSource.Camera ? cameraIcon : galleryIcon;
+            imageSourceIcon.gameObject.SetActive(imageSourceIcon.sprite != null);
         }
+
+        private void ClearImagePreviewTexture()
+        {
+            if (imagePreviewTexture == null)
+                return;
+
+            Destroy(imagePreviewTexture);
+            imagePreviewTexture = null;
+        }
+
+        private void SetForegroundSize(Texture2D texture)
+        {
+            var parentSize = imagePreview.rectTransform.rect.size;
+            var scale = Mathf.Min(parentSize.x / texture.width, parentSize.y / texture.height);
+            imageForeground.rectTransform.sizeDelta = new Vector2(texture.width * scale, texture.height * scale);
+        }
+
     }
 }
